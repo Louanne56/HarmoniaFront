@@ -5,17 +5,17 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import { AuthProvider, useAuth } from './src/services/AuthContext';
-import { FavoritesProvider } from './src/services/FavoritesContext';
+import { AuthProvider, useAuth } from './services/AuthContext';
+import { FavoritesProvider } from './services/FavoritesContext';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 // Import des pages et composants
-import Connexion from './src/pages/Connexion';
-import Inscription from './src/pages/Inscription';
-import Home from './src/pages/Home';
-import Accords from './src/pages/Accords';
-import FavoritePage from './src/pages/FavoritePage';
-import Header from './src/composants/Header'; // Composant d'en-tête personnalisé
+import Connexion from './pages/Connexion';
+import Inscription from './pages/Inscription';
+import Home from './pages/Home';
+import Accords from './pages/Accords';
+import FavoritePage from './pages/FavoritePage';
+import Header from './composants/Header'; // Composant d'en-tête personnalisé
 // Création des navigateurs
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -113,8 +113,8 @@ const App = () => {
   return (
     <SafeAreaProvider>
       <AuthProvider>
-        <FavoritesProvider>
-          <NavigationManager /> // Gestion de la navigation selon l'état de connexion
+        <FavoritesProvider> 
+          <NavigationManager />
         </FavoritesProvider>
       </AuthProvider>
     </SafeAreaProvider>

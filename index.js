@@ -1,8 +1,7 @@
 import { registerRootComponent } from 'expo';
+import App from './src/App'; // Chemin relatif correct
 
-import App from './App';
+// Enveloppez App avec des Providers si nécessaire (Navigation, Redux, etc.)
+console.log('✅ Index.js loaded'); // Debug
 
-// registerRootComponent calls AppRegistry.registerComponent('main', () => App);
-// It also ensures that whether you load the app in Expo Go or in a native build,
-// the environment is set up appropriately
 registerRootComponent(App);

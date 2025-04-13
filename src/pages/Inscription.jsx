@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import { API_URL } from '../services/apiConfig';
+import {inscrireUtilisateur} from '../services/apiService'; // Importation de la fonction d'inscription
 
 const Inscription = ({ navigation }) => {
   // Définition des états locaux pour les champs du formulaire
@@ -13,74 +14,45 @@ const Inscription = ({ navigation }) => {
 
   // Fonction de gestion de l'inscription
   const handleInscription = async () => {
-    // Validation basique des champs
+    // Validation (identique à votre version actuelle)
     if (!pseudo || !email || !motDePasse || !confirmationMotDePasse) {
       Alert.alert('Erreur', 'Veuillez remplir tous les champs');
       return;
     }
-
-    // Vérification que les mots de passe correspondent
+  
     if (motDePasse !== confirmationMotDePasse) {
       Alert.alert('Erreur', 'Les mots de passe ne correspondent pas');
       return;
     }
-
-    // Vérification de la longueur du mot de passe
+  
     if (motDePasse.length < 6) {
       Alert.alert('Erreur', 'Le mot de passe doit contenir au moins 6 caractères');
       return;
     }
-
-    setLoading(true); // Démarrer le chargement
-
-    try {
-      console.log("Envoi des données:", { pseudo, email, motDePasse }); // Debug
-
-      // Requête d'inscription à l'API
-      const response = await axios.post(`${API_URL}/auth/inscription`, {
-        pseudo,
-        email,
-        motDePasse
-      }, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      });
-
-      console.log("Réponse du serveur:", response.data); // Debug
-
-      // Navigation vers la page de connexion après inscription réussie
+  
+    setLoading(true);
+  
+    const result = await inscrireUtilisateur({
+      pseudo,
+      email,
+      motDePasse
+    });
+  
+    setLoading(false);
+  
+    if (result.success) {
       navigation.navigate('Connexion', { 
         newlyRegistered: true,
         email: email,
         message: `Inscription réussie ! Bienvenue ${pseudo}`
       });
-
-    } catch (error) {
-      console.error("Erreur détaillée:", {
-        message: error.message,
-        response: error.response?.data,
-        config: error.config
-      });
-
-      // Gestion des erreurs retournées par l'API
-      let errorMessage = "Erreur lors de l'inscription";
-      if (error.response?.data?.errors) {
-        errorMessage = Object.values(error.response.data.errors)
-          .flat()
-          .join('\n'); // Combine les messages d'erreur en une seule chaîne
-      } else if (error.response?.data?.Message) {
-        errorMessage = error.response.data.Message; // Message spécifique d'erreur
-      }
-
-      // Affichage de l'erreur dans une alerte
-      Alert.alert('Erreur', errorMessage);
-    } finally {
-      setLoading(false); // Fin du processus, arrêt du chargement
+    } else {
+      Alert.alert(
+        'Erreur', 
+        result.errors.join('\n\n') || result.message
+      );
     }
   };
-
   return (
     <View style={styles.conteneurPrincipal}>
       <Text style={styles.titre}>Inscription</Text>
