@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'; // Importation des hooks React
 import { 
   View, 
   Text, 
@@ -9,50 +9,52 @@ import {
   Dimensions,
   TouchableOpacity,
   Alert
-} from 'react-native';
-import { Audio } from 'expo-av';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import { api, getResourceUrl } from '../services/apiService';
+} from 'react-native'; // Importation des composants de React Native
+import { Audio } from 'expo-av'; // Pour la gestion du son
+import Icon from 'react-native-vector-icons/MaterialIcons'; // Importation des icônes
+import { api, getResourceUrl } from '../services/apiService'; // Importation des services API
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get('window'); // Récupère la largeur de l'écran pour le calcul des tailles
 
 const Diagram = () => {
-  const [accords, setAccords] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [accords, setAccords] = useState([]); // État pour stocker la liste des accords
+  const [loading, setLoading] = useState(true); // État de chargement pour afficher l'indicateur de progression
 
   useEffect(() => {
+    // Récupère la liste des accords depuis l'API
     api.get('/accords')
       .then(response => {
-        setAccords(response.data);
-        setLoading(false);
+        setAccords(response.data); // Stocke les accords dans l'état
+        setLoading(false); // Arrête le chargement
       })
       .catch(error => {
         console.error('Erreur lors du chargement des accords:', error);
         setLoading(false);
         Alert.alert('Erreur', 'Impossible de charger les accords');
       });
-  }, []);
+  }, []); // L'effet s'exécute une seule fois au montage du composant
   
   // Fonction pour jouer le son d'un accord
   const playChordSound = async (accordNom, audio, audio2) => {
-    let audioFileName = audio || audio2;
+    let audioFileName = audio || audio2; // Choisit l'audio selon la disponibilité
     
     if (!audioFileName) {
       Alert.alert('Information', `Pas d'audio disponible pour l'accord ${accordNom}`);
       return;
     }
     
-    const audioUrl = getResourceUrl(`/audio/${audioFileName}`);
+    const audioUrl = getResourceUrl(`/audio/${audioFileName}`); // Construction de l'URL de l'audio
     console.log('Tentative de lecture audio:', audioUrl);
 
     try {
+      // Création de l'objet Audio et démarrage de la lecture
       const { sound } = await Audio.Sound.createAsync(
         { uri: audioUrl },
-        { shouldPlay: true } // Option pour commencer à jouer immédiatement
+        { shouldPlay: true } // Lance immédiatement la lecture
       ); 
       sound.setOnPlaybackStatusUpdate(status => {
         if (status.didJustFinish) {
-          sound.unloadAsync();
+          sound.unloadAsync(); // Libère les ressources une fois la lecture terminée
         }
       });
   
@@ -63,7 +65,7 @@ const Diagram = () => {
     }
   };
   
-  // Fonction pour construire l'URL d'une image
+  // Fonction pour construire l'URL de l'image
   const getImageUrl = (imageName) => {
     return getResourceUrl(`/images/${encodeURIComponent(imageName)}`);
   };
@@ -71,7 +73,7 @@ const Diagram = () => {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#f4f4f8',
+      backgroundColor: '#f4f4f8', // Fond gris clair
     },
     title: {
       fontSize: 24,
@@ -79,7 +81,7 @@ const Diagram = () => {
       textAlign: 'center',
       marginBottom: 20,
       color: '#2c3e50',
-      fontFamily: 'BoldonseRegular',
+      fontFamily: 'BoldonseRegular', // Police personnalisée
     },
     gridContainer: {
       flexDirection: 'row',
@@ -88,15 +90,15 @@ const Diagram = () => {
       paddingHorizontal: 10,
     },
     chordCard: {
-      width: width / 3 - 20,
-      backgroundColor: '#808080',
+      width: width / 3 - 20, // Carte d'accord de taille responsive
+      backgroundColor: '#808080', // Couleur de fond gris
       borderRadius: 15,
       marginBottom: 15,
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 4,
-      elevation: 3,
+      elevation: 3, // Ombre portée
       overflow: 'hidden',
       borderColor: 'black',
       borderWidth: 1,
@@ -106,7 +108,7 @@ const Diagram = () => {
       padding: 10,
       alignItems: 'center',
       justifyContent: 'center',
-      position: 'relative',
+      position: 'relative', // Nécessaire pour le positionnement de l'icône de volume
     },
     chordImage: {
       width: '100%',
@@ -128,17 +130,17 @@ const Diagram = () => {
       position: 'absolute',
       top: 3,
       right: 3,
-      backgroundColor: 'rgba(255, 255, 255, 0.7)',
+      backgroundColor: 'rgba(255, 255, 255, 0.7)', // Fond semi-transparent pour l'icône de volume
       borderRadius: 10,
       padding: 2,
-      zIndex: 10,
+      zIndex: 10, // Assure que l'icône soit au-dessus des autres éléments
     }
   });
 
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#3498db" />
+        <ActivityIndicator size="large" color="#3498db" /> {/* Indicateur de chargement */}
       </View>
     );
   }

@@ -4,34 +4,39 @@ import axios from 'axios';
 import { API_URL } from '../services/apiConfig';
 
 const Inscription = ({ navigation }) => {
+  // Définition des états locaux pour les champs du formulaire
   const [pseudo, setPseudo] = useState('');
   const [email, setEmail] = useState('');
   const [motDePasse, setMotDePasse] = useState('');
   const [confirmationMotDePasse, setConfirmationMotDePasse] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // Pour gérer l'état de chargement
 
+  // Fonction de gestion de l'inscription
   const handleInscription = async () => {
-    // Validation basique
+    // Validation basique des champs
     if (!pseudo || !email || !motDePasse || !confirmationMotDePasse) {
       Alert.alert('Erreur', 'Veuillez remplir tous les champs');
       return;
     }
 
+    // Vérification que les mots de passe correspondent
     if (motDePasse !== confirmationMotDePasse) {
       Alert.alert('Erreur', 'Les mots de passe ne correspondent pas');
       return;
     }
 
+    // Vérification de la longueur du mot de passe
     if (motDePasse.length < 6) {
       Alert.alert('Erreur', 'Le mot de passe doit contenir au moins 6 caractères');
       return;
     }
 
-    setLoading(true);
+    setLoading(true); // Démarrer le chargement
 
     try {
       console.log("Envoi des données:", { pseudo, email, motDePasse }); // Debug
-      
+
+      // Requête d'inscription à l'API
       const response = await axios.post(`${API_URL}/auth/inscription`, {
         pseudo,
         email,
@@ -45,7 +50,7 @@ const Inscription = ({ navigation }) => {
 
       console.log("Réponse du serveur:", response.data); // Debug
 
-      // Navigation directe sans alerte qui peut bloquer
+      // Navigation vers la page de connexion après inscription réussie
       navigation.navigate('Connexion', { 
         newlyRegistered: true,
         email: email,
@@ -59,19 +64,20 @@ const Inscription = ({ navigation }) => {
         config: error.config
       });
 
-      // Gestion spécifique des erreurs Identity
+      // Gestion des erreurs retournées par l'API
       let errorMessage = "Erreur lors de l'inscription";
       if (error.response?.data?.errors) {
         errorMessage = Object.values(error.response.data.errors)
           .flat()
-          .join('\n');
+          .join('\n'); // Combine les messages d'erreur en une seule chaîne
       } else if (error.response?.data?.Message) {
-        errorMessage = error.response.data.Message;
+        errorMessage = error.response.data.Message; // Message spécifique d'erreur
       }
 
+      // Affichage de l'erreur dans une alerte
       Alert.alert('Erreur', errorMessage);
     } finally {
-      setLoading(false);
+      setLoading(false); // Fin du processus, arrêt du chargement
     }
   };
 
@@ -80,6 +86,7 @@ const Inscription = ({ navigation }) => {
       <Text style={styles.titre}>Inscription</Text>
 
       <View style={styles.conteneurFormulaire}>
+        {/* Champ pseudo */}
         <TextInput
           style={styles.champ}
           placeholder="Pseudo"
@@ -89,6 +96,7 @@ const Inscription = ({ navigation }) => {
           autoCorrect={false}
         />
         
+        {/* Champ email */}
         <TextInput
           style={styles.champ}
           placeholder="Email"
@@ -99,34 +107,39 @@ const Inscription = ({ navigation }) => {
           autoComplete="email"
         />
         
+        {/* Champ mot de passe */}
         <TextInput
           style={styles.champ}
           placeholder="Mot de passe (6 caractères min)"
           value={motDePasse}
           onChangeText={setMotDePasse}
-          secureTextEntry={true}
+          secureTextEntry={true} // Masquer le mot de passe
         />
         
+        {/* Champ confirmation mot de passe */}
         <TextInput
           style={styles.champ}
           placeholder="Confirmez le mot de passe"
           value={confirmationMotDePasse}
           onChangeText={setConfirmationMotDePasse}
-          secureTextEntry={true}
+          secureTextEntry={true} // Masquer le mot de passe
         />
 
+        {/* Affichage d'un loader pendant le chargement */}
         {loading ? (
           <ActivityIndicator size="large" color="#808080" style={styles.loader} />
         ) : (
+          // Bouton d'inscription
           <TouchableOpacity 
             style={styles.bouton} 
             onPress={handleInscription}
-            disabled={loading}
+            disabled={loading} // Désactive le bouton si déjà en chargement
           >
             <Text style={styles.texteBouton}>S'inscrire</Text>
           </TouchableOpacity>
         )}
 
+        {/* Lien vers la page de connexion */}
         <TouchableOpacity 
           style={styles.lienConnexion}
           onPress={() => navigation.navigate('Connexion')}
@@ -138,6 +151,7 @@ const Inscription = ({ navigation }) => {
   );
 };
 
+// Styles pour la page
 const styles = StyleSheet.create({
   conteneurPrincipal: {
     flex: 1,

@@ -319,6 +319,14 @@ export const toggleFavoriteAPI = async (userId, progressionId, isFavorite) => {
     throw error;
   }
 };
+export const fetchUserFavorites = async (userId) => {
+  try {
+    const response = await axios.get(`${API_URL}/suites-favorites/user/${userId}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
 
 // Gestion des ressources médias
 export const getResourceUrl = (path) => {

@@ -5,39 +5,36 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import { AuthProvider, useAuth } from './services/AuthContext';
-import { FavoritesProvider } from './services/FavoritesContext';
+import { AuthProvider, useAuth } from './src/services/AuthContext';
+import { FavoritesProvider } from './src/services/FavoritesContext';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-
 // Import des pages et composants
-import Connexion from './pages/Connexion';
-import Inscription from './pages/Inscription';
-import Home from './pages/Home';
-import Accords from './pages/Accords';
-import FavoritePage from './pages/FavoritePage';
-import Header from './components/Header';
-
+import Connexion from './src/pages/Connexion';
+import Inscription from './src/pages/Inscription';
+import Home from './src/pages/Home';
+import Accords from './src/pages/Accords';
+import FavoritePage from './src/pages/FavoritePage';
+import Header from './src/composants/Header'; // Composant d'en-tête personnalisé
 // Création des navigateurs
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const AuthStack = createStackNavigator();
 
-// Écran de chargement
+// Écran de chargement, affiché pendant la vérification de l'état de connexion
 const LoadingScreen = () => (
   <View style={styles.loadingContainer}>
     <ActivityIndicator size="large" color="#6200ee" />
   </View>
 );
 
-// Navigation par onglets pour les pages principales (inchangée)
+// TabNavigator : gestion de la navigation par onglets pour les pages principales (Home, Accords, Favoris)
 const TabNavigator = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
-
           if (route.name === 'Home') {
             iconName = focused ? 'home' : 'home-outline';
           } else if (route.name === 'Accords') {
@@ -45,12 +42,11 @@ const TabNavigator = () => {
           } else if (route.name === 'Favoris') {
             iconName = focused ? 'heart' : 'heart-outline';
           }
-
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: '#6200ee',
         tabBarInactiveTintColor: 'gray',
-        headerShown: false,
+        headerShown: false, // Pas d'en-tête sur les écrans du TabNavigator
       })}
     >
       <Tab.Screen name="Home" component={Home} />
@@ -60,7 +56,7 @@ const TabNavigator = () => {
   );
 };
 
-// Stack de navigation pour l'authentification
+// AuthStackNavigator : gestion de la navigation pour l'authentification (Connexion, Inscription)
 const AuthStackNavigator = () => (
   <AuthStack.Navigator initialRouteName="Connexion">
     <AuthStack.Screen 
@@ -76,67 +72,61 @@ const AuthStackNavigator = () => (
   </AuthStack.Navigator>
 );
 
-// Composant de navigation principale qui détermine quelle pile afficher
+// NavigationManager : vérifie si l'utilisateur est connecté et affiche la navigation appropriée
 const NavigationManager = () => {
   const { isLoggedIn, loading, token, refreshUserToken } = useAuth();
   
-  // À l'initialisation, essayer de rafraîchir le token si disponible
   useEffect(() => {
     const checkTokenAndRefresh = async () => {
       if (token) {
-        await refreshUserToken();
+        await refreshUserToken(); // Rafraîchit le token si disponible
       }
     };
-    
     checkTokenAndRefresh();
-  }, []);
+  }, []); // Effect exécuté une fois au chargement initial
 
   if (loading) {
-    // Afficher l'écran de chargement pendant la vérification des tokens
-    return <LoadingScreen />;
+    return <LoadingScreen />; // Afficher l'écran de chargement pendant la vérification
   }
 
   return (
     <NavigationContainer>
       {isLoggedIn ? (
-        // L'utilisateur est connecté, afficher l'application principale
+        // Si l'utilisateur est connecté, afficher les pages principales
         <Stack.Navigator>
           <Stack.Screen 
             name="MainTabs" 
             component={TabNavigator} 
-            options={{ 
-              headerShown: true,
-            header: () => <Header/>,}}
+            options={{ headerShown: true, header: () => <Header/> }} // Header personnalisé
           />
         </Stack.Navigator>
       ) : (
-        // L'utilisateur n'est pas connecté, afficher les écrans d'authentification
+        // Si l'utilisateur n'est pas connecté, afficher les pages de connexion
         <AuthStackNavigator />
       )}
     </NavigationContainer>
   );
 };
 
-// Application principale
+// App : composant principal qui englobe l'ensemble des providers et le gestionnaire de navigation
 const App = () => {
   return (
     <SafeAreaProvider>
-
-    <AuthProvider>
-      <FavoritesProvider>
-        <NavigationManager />
-      </FavoritesProvider>
-    </AuthProvider>
+      <AuthProvider>
+        <FavoritesProvider>
+          <NavigationManager /> // Gestion de la navigation selon l'état de connexion
+        </FavoritesProvider>
+      </AuthProvider>
     </SafeAreaProvider>
   );
 };
 
 const styles = StyleSheet.create({
-  loadingContainer: {
+  loadingContainer: { 
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#f5f5f5', // Fond de l'écran de chargement
   },
 });
 
