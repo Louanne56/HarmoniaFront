@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
-import axios from 'axios';
-import { API_URL } from '../services/apiConfig';
 import {inscrireUtilisateur} from '../services/apiService'; // Importation de la fonction d'inscription
 
 const Inscription = ({ navigation }) => {
@@ -25,8 +23,8 @@ const Inscription = ({ navigation }) => {
       return;
     }
   
-    if (motDePasse.length < 6) {
-      Alert.alert('Erreur', 'Le mot de passe doit contenir au moins 6 caractères');
+    if (motDePasse.length < 4) {
+      Alert.alert('Erreur', 'Le mot de passe doit contenir au moins 4 caractères');
       return;
     }
   

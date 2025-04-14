@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, FlatList, ActivityIndicator, Alert } from 'react-native';
 import { useAuth } from "../services/AuthContext"; // Contexte pour récupérer les informations de l'utilisateur
 import ProgressionCard from '../composants/ProgressionCard'; // Composant pour afficher chaque progression d'accords
-import { toggleFavoriteAPI, fetchUserFavorites } from '../services/apiService'; // Services API pour gérer les favoris
+import { toggleFavoriteAPI, getUserFavorites } from '../services/apiService'; // Services API pour gérer les favoris
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Pour accéder au stockage local
 import { useFocusEffect } from '@react-navigation/native'; // Hook pour exécuter du code lors du focus sur la page
 import { useCallback } from 'react';
@@ -29,7 +29,7 @@ const FavoritePage = () => {
   const fetchFavorites = async () => {
     try {
       setLoading(true); // Début du chargement
-      const data = await fetchUserFavorites(userId); // Appel API pour récupérer les favoris de l'utilisateur
+      const data = await getUserFavorites(userId); // Appel API pour récupérer les favoris de l'utilisateur
       setFavorites(data); // Mise à jour des favoris
       setLoading(false); // Fin du chargement
     } catch (err) {
