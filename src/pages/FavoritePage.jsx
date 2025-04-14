@@ -1,4 +1,3 @@
-import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, FlatList, ActivityIndicator, Alert } from 'react-native';
 import { useAuth } from "../services/AuthContext"; // Contexte pour récupérer les informations de l'utilisateur
